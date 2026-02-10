@@ -3,7 +3,7 @@ name: Frontend CI/CD
 env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PAT: ${{ secrets.DOCKER_PAT }}
-  IMAGE_NAME: eschool-frontend
+  IMAGE_NAME: eschool
 
 on:
   push:
@@ -24,28 +24,37 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '14'
+          node-version: '18'
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/yarn
+            node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
 
       - name: Install deps
         run: |
           npm install -g @angular/cli@7
-          yarn install
+          yarn install --frozen-lockfile
 
       - name: SonarQube scan
+        uses: SonarSource/sonarqube-scan-action@v2
         env:
-          SONAR_HOST: ${{ secrets.SONAR_HOST }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          sonar-scanner \
-            -Dsonar.projectKey=eschool-frontend-final-project \
-            -Dsonar.sources=src \
-            -Dsonar.host.url=$SONAR_HOST \
-            -Dsonar.login=$SONAR_TOKEN
+        with:
+          args: >
+            -Dsonar.projectKey=eschool-frontend-final-project
+            -Dsonar.sources=src
+
 
   docker-build-and-push:
     name: Build & Push Docker image
     runs-on: ubuntu-latest
-    needs: sonar
     if: github.event_name != 'pull_request'
 
     steps:
@@ -57,19 +66,21 @@ jobs:
       - name: Build image
         run: |
           docker build \
-            -t $DOCKER_USERNAME/$IMAGE_NAME:${GITHUB_RUN_NUMBER} \
-            -t $DOCKER_USERNAME/$IMAGE_NAME:latest \
+            -t $DOCKER_USERNAME/$IMAGE_NAME:frontend-${GITHUB_RUN_NUMBER} \
+            -t $DOCKER_USERNAME/$IMAGE_NAME:frontend-latest \
             .
 
       - name: Push image
         run: |
-          docker push $DOCKER_USERNAME/$IMAGE_NAME:${GITHUB_RUN_NUMBER}
-          docker push $DOCKER_USERNAME/$IMAGE_NAME:latest
+          docker push $DOCKER_USERNAME/$IMAGE_NAME:frontend-${GITHUB_RUN_NUMBER}
+          docker push $DOCKER_USERNAME/$IMAGE_NAME:frontend-latest
+
 
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
     needs: docker-build-and-push
+    if: github.ref == 'refs/heads/main'
 
     steps:
       - uses: appleboy/ssh-action@v1
@@ -78,6 +89,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            cd /path/to/docker-compose
-            docker pull $DOCKER_USERNAME/$IMAGE_NAME:latest 
-            docker compose restart frontend
+            export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
+            export IMAGE_NAME=eschool
+            docker pull $DOCKER_USERNAME/$IMAGE_NAME:frontend-latest
+            docker compose up -d --force-recreate frontend
