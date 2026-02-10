@@ -90,5 +90,5 @@ jobs:
           script: |
             export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
             export IMAGE_NAME=eschool
-            docker pull $DOCKER_USERNAME/$IMAGE_NAME:frontend-latest
-            docker compose up -d --force-recreate frontend
+            sudo docker pull $DOCKER_USERNAME/$IMAGE_NAME:frontend-latest
+            sudo docker compose up -d --force-recreate frontend
