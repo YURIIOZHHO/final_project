@@ -79,9 +79,7 @@ jobs:
   deploy:
     name: Deploy Frontend
     runs-on: ubuntu-latest
-    on:
-      push:
-        branches: [main]
+    needs: docker-build-and-push
 
     steps:
       - name: Checkout
@@ -107,4 +105,4 @@ docker pull $DOCKER_USERNAME/$IMAGE_NAME:frontend-latest
 docker compose up -d --force-recreate frontend
 EOF
 
-rm -f private_key.pem
+          rm -f private_key.pem
