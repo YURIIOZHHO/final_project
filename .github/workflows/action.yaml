@@ -51,7 +51,7 @@ jobs:
             -Dsonar.projectKey=eschool-frontend-final-project
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
             -Dsonar.sources=src
-            -Dsonar.branch.name=${{ github.ref_name }}
+            -Dsonar.branch.name=master
 
   # docker-build-and-push:
   #   name: Build & Push Docker image
