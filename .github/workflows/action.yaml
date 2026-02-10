@@ -91,6 +91,8 @@ jobs:
             export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
             export DOCKER_PAT=${{ secrets.DOCKER_PAT }}
             export IMAGE_NAME=eschool
-            echo "$DOCKER_PAT" | sudo docker login -u "$DOCKER_USERNAME" --password-stdin
+            echo "$DOCKER_PAT" > /tmp/docker_pass
+            sudo docker login -u "$DOCKER_USERNAME" --password-stdin < /tmp/docker_pass
+            sudo rm /tmp/docker_pass
             sudo docker pull $DOCKER_USERNAME/$IMAGE_NAME:frontend-latest
             sudo docker compose up -d --force-recreate frontend
