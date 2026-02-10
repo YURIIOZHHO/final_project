@@ -50,56 +50,56 @@ jobs:
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
             -Dsonar.sources=src
 
-  docker-build-and-push:
-    name: Build & Push Docker image
-    runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request'
-    steps:
-      - uses: actions/checkout@v4
+  # docker-build-and-push:
+  #   name: Build & Push Docker image
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name != 'pull_request'
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Docker login
-        run: echo "$DOCKER_PAT" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  #     - name: Docker login
+  #       run: echo "$DOCKER_PAT" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
-      - name: Build image
-        run: |
-          docker build \
-            -t $DOCKER_USERNAME/$IMAGE_NAME:frontend-${GITHUB_RUN_NUMBER} \
-            -t $DOCKER_USERNAME/$IMAGE_NAME:frontend-latest \
-            .
+  #     - name: Build image
+  #       run: |
+  #         docker build \
+  #           -t $DOCKER_USERNAME/$IMAGE_NAME:frontend-${GITHUB_RUN_NUMBER} \
+  #           -t $DOCKER_USERNAME/$IMAGE_NAME:frontend-latest \
+  #           .
 
-      - name: Push image
-        run: |
-          docker push $DOCKER_USERNAME/$IMAGE_NAME:frontend-${GITHUB_RUN_NUMBER}
-          docker push $DOCKER_USERNAME/$IMAGE_NAME:frontend-latest
+  #     - name: Push image
+  #       run: |
+  #         docker push $DOCKER_USERNAME/$IMAGE_NAME:frontend-${GITHUB_RUN_NUMBER}
+  #         docker push $DOCKER_USERNAME/$IMAGE_NAME:frontend-latest
 
-  deploy:
-    name: Deploy Frontend
-    runs-on: ubuntu-latest
-    needs: docker-build-and-push
-    if: github.event_name != 'pull_request'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+  # deploy:
+  #   name: Deploy Frontend
+  #   runs-on: ubuntu-latest
+  #   needs: docker-build-and-push
+  #   if: github.event_name != 'pull_request'
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
 
-      - name: SSH and deploy
-        env:
-          PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
-          SERVER_IP: ${{ secrets.SERVER_IP }}
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PAT: ${{ secrets.DOCKER_PAT }}
-          IMAGE_NAME: eschool
-        run: |
-          echo "$PRIVATE_KEY" > private_key.pem
-          chmod 600 private_key.pem
-          ssh -o StrictHostKeyChecking=no -i private_key.pem ec2-user@$SERVER_IP << 'EOF'
-            export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
-            export DOCKER_PAT=${{ secrets.DOCKER_PAT }}
-            export IMAGE_NAME=eschool
+  #     - name: SSH and deploy
+  #       env:
+  #         PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+  #         SERVER_IP: ${{ secrets.SERVER_IP }}
+  #         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  #         DOCKER_PAT: ${{ secrets.DOCKER_PAT }}
+  #         IMAGE_NAME: eschool
+  #       run: |
+  #         echo "$PRIVATE_KEY" > private_key.pem
+  #         chmod 600 private_key.pem
+  #         ssh -o StrictHostKeyChecking=no -i private_key.pem ec2-user@$SERVER_IP << 'EOF'
+  #           export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
+  #           export DOCKER_PAT=${{ secrets.DOCKER_PAT }}
+  #           export IMAGE_NAME=eschool
 
-            echo "$DOCKER_PAT" | sudo docker login -u "$DOCKER_USERNAME" --password-stdin
-            sudo docker pull $DOCKER_USERNAME/$IMAGE_NAME:frontend-latest
+  #           echo "$DOCKER_PAT" | sudo docker login -u "$DOCKER_USERNAME" --password-stdin
+  #           sudo docker pull $DOCKER_USERNAME/$IMAGE_NAME:frontend-latest
       
-            sudo docker compose up -d --force-recreate frontend
+  #           sudo docker compose up -d --force-recreate frontend
 
-          EOF
-          rm -f private_key.pem
+  #         EOF
+  #         rm -f private_key.pem
