@@ -76,35 +76,35 @@ jobs:
           docker push $DOCKER_USERNAME/$IMAGE_NAME:frontend-latest
 
 
-deploy:
-  name: Deploy Frontend
-  runs-on: ubuntu-latest
-  on:
-    push:
-      branches: [main]
+  deploy:
+    name: Deploy Frontend
+    runs-on: ubuntu-latest
+    on:
+      push:
+        branches: [main]
 
-  steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: SSH and deploy
-      env:
-        PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
-        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-        DOCKER_PAT: ${{ secrets.DOCKER_PAT }}
-        IMAGE_NAME: eschool
-      run: |
-        echo "$PRIVATE_KEY" > private_key.pem
-        chmod 600 private_key.pem
+      - name: SSH and deploy
+        env:
+          PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PAT: ${{ secrets.DOCKER_PAT }}
+          IMAGE_NAME: eschool
+        run: |
+          echo "$PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
 
-        ssh -o StrictHostKeyChecking=no -i private_key.pem ec2-user@${{ secrets.SERVER_IP }} <<EOF
-          export DOCKER_USERNAME=$DOCKER_USERNAME
-          export DOCKER_PAT=$DOCKER_PAT
-          export IMAGE_NAME=$IMAGE_NAME
+          ssh -o StrictHostKeyChecking=no -i private_key.pem ec2-user@${{ secrets.SERVER_IP }} <<EOF
+            export DOCKER_USERNAME=$DOCKER_USERNAME
+            export DOCKER_PAT=$DOCKER_PAT
+            export IMAGE_NAME=$IMAGE_NAME
 
-          echo "$DOCKER_PAT" | docker login -u "$DOCKER_USERNAME" --password-stdin
-          docker pull $DOCKER_USERNAME/$IMAGE_NAME:frontend-latest
-          docker compose up -d --force-recreate frontend
-EOF
+            echo "$DOCKER_PAT" | docker login -u "$DOCKER_USERNAME" --password-stdin
+            docker pull $DOCKER_USERNAME/$IMAGE_NAME:frontend-latest
+            docker compose up -d --force-recreate frontend
+  EOF
 
-        rm -f private_key.pem
+          rm -f private_key.pem
