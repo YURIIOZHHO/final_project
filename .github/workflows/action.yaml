@@ -96,13 +96,13 @@ jobs:
           chmod 600 private_key.pem
 
           ssh -o StrictHostKeyChecking=no -i private_key.pem ec2-user@${{ secrets.SERVER_IP }} <<EOF
-    export DOCKER_USERNAME=$DOCKER_USERNAME
-    export DOCKER_PAT=$DOCKER_PAT
-    export IMAGE_NAME=$IMAGE_NAME
+export DOCKER_USERNAME=$DOCKER_USERNAME
+export DOCKER_PAT=$DOCKER_PAT
+export IMAGE_NAME=$IMAGE_NAME
 
-    echo "$DOCKER_PAT" | docker login -u "$DOCKER_USERNAME" --password-stdin
-    docker pull $DOCKER_USERNAME/$IMAGE_NAME:frontend-latest
-    docker compose up -d --force-recreate frontend
+echo "$DOCKER_PAT" | docker login -u "$DOCKER_USERNAME" --password-stdin
+docker pull $DOCKER_USERNAME/$IMAGE_NAME:frontend-latest
+docker compose up -d --force-recreate frontend
 EOF
 
-    rm -f private_key.pem
+          rm -f private_key.pem
