@@ -24,15 +24,15 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Cache node modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/yarn
-            node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+      # - name: Cache node modules
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: |
+      #       ~/.cache/yarn
+      #       node_modules
+      #     key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-yarn-
 
       - name: Install deps
         run: |
@@ -42,7 +42,7 @@ jobs:
       - name: SonarQube scan
         uses: SonarSource/sonarqube-scan-action@v2
         env:
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
