@@ -49,9 +49,10 @@ jobs:
         with:
           args: >
             -Dsonar.projectKey=eschool-frontend-final-project
+            -Dsonar.projectName=Eschool-Frontend-Final
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
             -Dsonar.sources=src
-            -Dsonar.branch.name=master
+            -Dsonar.qualitygate.wait=true
 
   # docker-build-and-push:
   #   name: Build & Push Docker image
