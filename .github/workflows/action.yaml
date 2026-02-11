@@ -33,8 +33,6 @@ jobs:
             -Dsonar.projectKey=eschool-frontend-final-project
             -Dsonar.projectName=Eschool-Frontend-Final
             -Dsonar.sources=src
-            -Dsonar.branch.name=${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
-
 
   # docker-build-and-push:
   #   name: Build & Push Docker image
