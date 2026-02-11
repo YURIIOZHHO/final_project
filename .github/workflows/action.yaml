@@ -34,12 +34,17 @@ jobs:
             -Dsonar.projectName=Eschool-Frontend-Final
             -Dsonar.sources=src
             
-      - name: SonarQube Quality Gate Report
-        uses: sonarsource/sonarqube-quality-gate-report@v1
+      - name: SonarQube Quality Gate check
+        id: sonarqube-quality-gate-check
+        uses: sonarsource/sonarqube-quality-gate-action@master
         with:
-          sonar_host_url: ${{ secrets.SONAR_HOST_URL }}
-          sonar_token: ${{ secrets.SONAR_TOKEN }}
-          project_key: eschool-frontend-final-project
+          pollingTimeoutSec: 600
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} 
+
+      - name: "Example show SonarQube Quality Gate Status value"
+        run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
     
   # docker-build-and-push:
   #   name: Build & Push Docker image
