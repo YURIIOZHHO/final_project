@@ -52,6 +52,7 @@ jobs:
             -Dsonar.projectName=Eschool-Frontend-Final
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
             -Dsonar.sources=src
+            -Dsonar.branch.name=${{ github.head_ref }}
             -Dsonar.qualitygate.wait=true
 
   # docker-build-and-push:
