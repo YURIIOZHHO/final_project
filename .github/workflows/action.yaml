@@ -34,13 +34,12 @@ jobs:
             -Dsonar.projectName=Eschool-Frontend-Final
             -Dsonar.sources=src
             
-      - name: SonarQube Quality Gate
-        uses: sonarsource/sonarqube-quality-gate-action@v1
+      - name: SonarQube Quality Gate Report
+        uses: sonarsource/sonarqube-quality-gate-report@v1
         with:
-          scanMetadataReportFile: target/sonar/report-task.txt
-        env:
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          sonar_host_url: ${{ secrets.SONAR_HOST_URL }}
+          sonar_token: ${{ secrets.SONAR_TOKEN }}
+          project_key: eschool-frontend-final-project
     
   # docker-build-and-push:
   #   name: Build & Push Docker image
