@@ -33,7 +33,15 @@ jobs:
             -Dsonar.projectKey=eschool-frontend-final-project
             -Dsonar.projectName=Eschool-Frontend-Final
             -Dsonar.sources=src
-
+            
+      - name: SonarQube Quality Gate
+        uses: sonarsource/sonarqube-quality-gate-action@v1
+        with:
+          scanMetadataReportFile: target/sonar/report-task.txt
+        env:
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    
   # docker-build-and-push:
   #   name: Build & Push Docker image
   #   runs-on: ubuntu-latest
