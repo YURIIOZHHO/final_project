@@ -30,8 +30,8 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.projectKey=eschool-frontend-final-project
-            -Dsonar.projectName=Eschool-Frontend-Final
+            -Dsonar.projectKey=eschool-frontend-final-project \
+            -Dsonar.projectName=Eschool-Frontend-Final \
             -Dsonar.pullrequest.key=${{ github.event.pull_request.number }} \
             -Dsonar.pullrequest.branch=${{ github.head_ref }} \
             -Dsonar.pullrequest.base=$BASE_BRANCH \
