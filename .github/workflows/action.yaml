@@ -15,135 +15,135 @@ jobs:
       - name: Checkout code 
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          # cache: 'yarn'
+      # - name: Setup Node
+      #   uses: actions/setup-node@v4
+      #   with:
+      #     node-version: '18'
+      #     # cache: 'yarn'
 
-      - name: Install dependencies
-        run: |
-          npm install -g @angular/cli@7
-          yarn install --frozen-lockfile
+      # - name: Install dependencies
+      #   run: |
+      #     npm install -g @angular/cli@7
+      #     yarn install --frozen-lockfile
       
-      - name: SonarQube scan
-        uses: SonarSource/sonarqube-scan-action@v4.1.0
-        with:
-          args: >
-            -Dsonar.projectName=eschool-frontend-final-project
-            -Dsonar.projectKey=eschool-frontend-final-project
-            -DskipTests
-            # -Dsonar.pullrequest.key=${{ github.event.pull_request.number }} \
-            # -Dsonar.pullrequest.branch=${{ github.head_ref }} \
-            # -Dsonar.pullrequest.base=master \
-        env:
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      # - name: SonarQube scan
+      #   uses: SonarSource/sonarqube-scan-action@v4.1.0
+      #   with:
+      #     args: >
+      #       -Dsonar.projectName=eschool-frontend-final-project
+      #       -Dsonar.projectKey=eschool-frontend-final-project
+      #       -DskipTests
+      #       # -Dsonar.pullrequest.key=${{ github.event.pull_request.number }} \
+      #       # -Dsonar.pullrequest.branch=${{ github.head_ref }} \
+      #       # -Dsonar.pullrequest.base=master \
+      #   env:
+      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
           
-      - name: SonarQube Quality Gate check
-        id: sonarqube-quality-gate-check
-        uses: sonarsource/sonarqube-quality-gate-action@master
-        with:
-          pollingTimeoutSec: 600
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} 
+      # - name: SonarQube Quality Gate check
+      #   id: sonarqube-quality-gate-check
+      #   uses: sonarsource/sonarqube-quality-gate-action@master
+      #   with:
+      #     pollingTimeoutSec: 600
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} 
 
-      - name: "Example show SonarQube Quality Gate Status value"
-        run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
+      # - name: "Example show SonarQube Quality Gate Status value"
+      #   run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
 
-      - name: Get SonarQube Report (New Code + Overall)
-        id: sonar-report
-        if: github.event_name == 'pull_request'
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: |
-          NEW_CODE=$(curl -s -u "$SONAR_TOKEN:" \
-            "$SONAR_HOST_URL/api/measures/component?component=eschool-frontend-final-project&metricKeys=software_quality_security_rating,software_quality_reliability_rating,duplicated_lines_density,software_quality_reliability_issues,vulnerabilities,code_smells,coverage,security_hotspots&additionalFields=period")
+      # - name: Get SonarQube Report (New Code + Overall)
+      #   id: sonar-report
+      #   if: github.event_name == 'pull_request'
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      #   run: |
+      #     NEW_CODE=$(curl -s -u "$SONAR_TOKEN:" \
+      #       "$SONAR_HOST_URL/api/measures/component?component=eschool-frontend-final-project&metricKeys=software_quality_security_rating,software_quality_reliability_rating,duplicated_lines_density,software_quality_reliability_issues,vulnerabilities,code_smells,coverage,security_hotspots&additionalFields=period")
       
-          OVERALL=$(curl -s -u "$SONAR_TOKEN:" \
-            "$SONAR_HOST_URL/api/measures/component?component=eschool-frontend-final-project&metricKeys=software_quality_security_rating,software_quality_reliability_rating,duplicated_lines_density,software_quality_reliability_issues,vulnerabilities,code_smells,coverage,security_hotspots,lines,ncloc")
+      #     OVERALL=$(curl -s -u "$SONAR_TOKEN:" \
+      #       "$SONAR_HOST_URL/api/measures/component?component=eschool-frontend-final-project&metricKeys=software_quality_security_rating,software_quality_reliability_rating,duplicated_lines_density,software_quality_reliability_issues,vulnerabilities,code_smells,coverage,security_hotspots,lines,ncloc")
       
-          echo "new_code_b64=$(echo "$NEW_CODE" | base64 -w 0)" >> $GITHUB_OUTPUT
-          echo "overall_b64=$(echo "$OVERALL" | base64 -w 0)" >> $GITHUB_OUTPUT
+      #     echo "new_code_b64=$(echo "$NEW_CODE" | base64 -w 0)" >> $GITHUB_OUTPUT
+      #     echo "overall_b64=$(echo "$OVERALL" | base64 -w 0)" >> $GITHUB_OUTPUT
       
-      - name: Post SonarQube results to PR
-        if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const qualityGateStatus = '${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}';
+      # - name: Post SonarQube results to PR
+      #   if: github.event_name == 'pull_request'
+      #   uses: actions/github-script@v7
+      #   with:
+      #     script: |
+      #       const qualityGateStatus = '${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}';
 
-            try {
-              const newCodeJson = Buffer
-                .from('${{ steps.sonar-report.outputs.new_code_b64 }}', 'base64')
-                .toString();
+      #       try {
+      #         const newCodeJson = Buffer
+      #           .from('${{ steps.sonar-report.outputs.new_code_b64 }}', 'base64')
+      #           .toString();
             
-              const overallJson = Buffer
-                .from('${{ steps.sonar-report.outputs.overall_b64 }}', 'base64')
-                .toString();
+      #         const overallJson = Buffer
+      #           .from('${{ steps.sonar-report.outputs.overall_b64 }}', 'base64')
+      #           .toString();
             
-              const newCode = JSON.parse(newCodeJson);
-              const overall = JSON.parse(overallJson);
+      #         const newCode = JSON.parse(newCodeJson);
+      #         const overall = JSON.parse(overallJson);
             
-              function extractMeasures(data) {
-                const result = {};
-                data.component.measures.forEach(m => {
-                  result[m.metric] = {
-                    overall: m.value ?? '0',
-                    new: m.period?.value ?? '0'
-                  };
-                });
-                return result;
-              }
+      #         function extractMeasures(data) {
+      #           const result = {};
+      #           data.component.measures.forEach(m => {
+      #             result[m.metric] = {
+      #               overall: m.value ?? '0',
+      #               new: m.period?.value ?? '0'
+      #             };
+      #           });
+      #           return result;
+      #         }
             
-              const newMetrics = extractMeasures(newCode);
-              const overallMetrics = extractMeasures(overall);
+      #         const newMetrics = extractMeasures(newCode);
+      #         const overallMetrics = extractMeasures(overall);
             
-              const body = `
-            ## SonarQube Analysis
+      #         const body = `
+      #       ## SonarQube Analysis
             
-            ### Quality Gate: **${qualityGateStatus}**
+      #       ### Quality Gate: **${qualityGateStatus}**
             
-            ### New Code
-            - Security rating on new code: ${newMetrics.software_quality_security_rating?.new}
-            - Reliability rating on new code: ${newMetrics.software_quality_reliability_rating?.new}
-            - Duplicated lines density (%) on new code: ${newMetrics.duplicated_lines_density?.new}
-            - Bugs: ${newMetrics.software_quality_reliability_issues?.new}
-            - Vulnerabilities: ${newMetrics.vulnerabilities?.new}
-            - Code Smells: ${newMetrics.code_smells?.new}
-            - Coverage: ${newMetrics.coverage?.new}%
-            - Security hotspots on new code ${newMetrics.security_hotspots?.new}
+      #       ### New Code
+      #       - Security rating on new code: ${newMetrics.software_quality_security_rating?.new}
+      #       - Reliability rating on new code: ${newMetrics.software_quality_reliability_rating?.new}
+      #       - Duplicated lines density (%) on new code: ${newMetrics.duplicated_lines_density?.new}
+      #       - Bugs: ${newMetrics.software_quality_reliability_issues?.new}
+      #       - Vulnerabilities: ${newMetrics.vulnerabilities?.new}
+      #       - Code Smells: ${newMetrics.code_smells?.new}
+      #       - Coverage: ${newMetrics.coverage?.new}%
+      #       - Security hotspots on new code ${newMetrics.security_hotspots?.new}
             
-            ---
+      #       ---
             
-            ### Overall Code
-            - Security Rating: ${overallMetrics.software_quality_security_rating?.overall}
-            - Reliability rating: ${overallMetrics.software_quality_reliability_rating?.overall}
-            - Duplicated lines density (%): ${overallMetrics.duplicated_lines_density?.overall}
-            - Bugs: ${overallMetrics.software_quality_reliability_issues?.overall}
-            - Vulnerabilities: ${overallMetrics.vulnerabilities?.overall}
-            - Code Smells: ${overallMetrics.code_smells?.overall}
-            - Coverage: ${overallMetrics.coverage?.overall}%
-            - Security hotspots ${overallMetrics.security_hotspots?.overall}
-            - Lines: ${overallMetrics.lines?.overall}
-            - ncloc: ${overallMetrics.ncloc?.overall}
+      #       ### Overall Code
+      #       - Security Rating: ${overallMetrics.software_quality_security_rating?.overall}
+      #       - Reliability rating: ${overallMetrics.software_quality_reliability_rating?.overall}
+      #       - Duplicated lines density (%): ${overallMetrics.duplicated_lines_density?.overall}
+      #       - Bugs: ${overallMetrics.software_quality_reliability_issues?.overall}
+      #       - Vulnerabilities: ${overallMetrics.vulnerabilities?.overall}
+      #       - Code Smells: ${overallMetrics.code_smells?.overall}
+      #       - Coverage: ${overallMetrics.coverage?.overall}%
+      #       - Security hotspots ${overallMetrics.security_hotspots?.overall}
+      #       - Lines: ${overallMetrics.lines?.overall}
+      #       - ncloc: ${overallMetrics.ncloc?.overall}
             
-            [View Full Report](${{ secrets.SONAR_HOST_URL }}/dashboard)
-            `;
+      #       [View Full Report](${{ secrets.SONAR_HOST_URL }}/dashboard)
+      #       `;
             
-              await github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body
-              });
+      #         await github.rest.issues.createComment({
+      #           issue_number: context.issue.number,
+      #           owner: context.repo.owner,
+      #           repo: context.repo.repo,
+      #           body
+      #         });
             
-            } catch (error) {
-              console.error(error);
-            }
+      #       } catch (error) {
+      #         console.error(error);
+      #       }
     
   # docker-build-and-push:
   #   name: Build & Push Docker image
