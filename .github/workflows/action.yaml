@@ -27,7 +27,7 @@ jobs:
           yarn install --frozen-lockfile
       
       - name: SonarQube scan
-        uses: SonarSource/sonarqube-scan-action@v4.1.0
+        uses: SonarSource/sonarqube-scan-action@v6
         with:
           args: >
             -Dsonar.projectName=eschool-frontend-final-project
