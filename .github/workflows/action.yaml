@@ -17,11 +17,19 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Cache Node modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
       - name: Install dependencies
         run: |
           npm install -g @angular/cli@7
           yarn install --frozen-lockfile
-
+      
       - name: SonarQube scan
         uses: SonarSource/sonarqube-scan-action@v4.1.0
         with:
