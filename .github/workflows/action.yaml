@@ -23,12 +23,11 @@ jobs:
           yarn install --frozen-lockfile
 
       - name: SonarQube scan
-        uses: SonarSource/sonarqube-scan-action@v1
+        uses: SonarSource/sonarqube-scan-action@v4.1.0
         with:
           args: >
-            -Dsonar.projectKey=eschool-backend-final-project \
-            -Dsonar.host.url=$SONAR_HOST_URL \
-            -Dsonar.token=$SONAR_TOKEN \
+            -Dsonar.projectName=eschool-frontend-final-project
+            -Dsonar.projectKey=eschool-frontend-final-project
             -DskipTests
             # -Dsonar.pullrequest.key=${{ github.event.pull_request.number }} \
             # -Dsonar.pullrequest.branch=${{ github.head_ref }} \
