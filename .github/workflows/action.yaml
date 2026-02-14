@@ -26,19 +26,19 @@ jobs:
           npm install -g @angular/cli@7
           yarn install --frozen-lockfile
       
-      # - name: SonarQube scan
-      #   uses: SonarSource/sonarqube-scan-action@v4.1.0
-      #   with:
-      #     args: >
-      #       -Dsonar.projectName=eschool-frontend-final-project
-      #       -Dsonar.projectKey=eschool-frontend-final-project
-      #       -DskipTests
-      #       # -Dsonar.pullrequest.key=${{ github.event.pull_request.number }} \
-      #       # -Dsonar.pullrequest.branch=${{ github.head_ref }} \
-      #       # -Dsonar.pullrequest.base=master \
-      #   env:
-      #     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: SonarQube scan
+        uses: SonarSource/sonarqube-scan-action@v4.1.0
+        with:
+          args: >
+            -Dsonar.projectName=eschool-frontend-final-project
+            -Dsonar.projectKey=eschool-frontend-final-project
+            -DskipTests
+            # -Dsonar.pullrequest.key=${{ github.event.pull_request.number }} \
+            # -Dsonar.pullrequest.branch=${{ github.head_ref }} \
+            # -Dsonar.pullrequest.base=master \
+        env:
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
           
       # - name: SonarQube Quality Gate check
