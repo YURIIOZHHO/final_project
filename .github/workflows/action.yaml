@@ -21,10 +21,10 @@ jobs:
           node-version: '18'
           cache: 'yarn'
 
-      # - name: Install dependencies
-      #   run: |
-      #     npm install -g @angular/cli@7
-      #     yarn install --frozen-lockfile
+      - name: Install dependencies
+        run: |
+          npm install -g @angular/cli@7
+          yarn install --frozen-lockfile
       
       # - name: SonarQube scan
       #   uses: SonarSource/sonarqube-scan-action@v4.1.0
