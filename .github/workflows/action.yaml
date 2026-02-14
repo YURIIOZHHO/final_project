@@ -66,6 +66,12 @@ jobs:
       
           OVERALL=$(curl -s -u "$SONAR_TOKEN:" \
             "$SONAR_HOST_URL/api/measures/component?component=eschool-frontend-final-project&metricKeys=software_quality_security_rating,software_quality_reliability_rating,duplicated_lines_density,software_quality_reliability_issues,vulnerabilities,code_smells,coverage,security_hotspots,lines,ncloc")
+
+          NEW_CODE_64="$(echo "$NEW_CODE" | base64 -w 0)"
+          OVERALL_64="$(echo "$OVERALL" | base64 -w 0)"
+
+          echo "$NEW_CODE_64"
+          echo "$OVERALL_64"
       
           echo "new_code_b64=$(echo "$NEW_CODE" | base64 -w 0)" >> $GITHUB_OUTPUT
           echo "overall_b64=$(echo "$OVERALL" | base64 -w 0)" >> $GITHUB_OUTPUT
